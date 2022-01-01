@@ -1,7 +1,4 @@
 #include "queue.h"
-#include <stdlib.h>
-#include <stdio.h>
-
 
 queue_node_t *queue_node_create(void *data)
 {
@@ -53,6 +50,11 @@ void *queue_pop(queue_t *queue)
     void *data = node->data;
     free(node);
     return data;
+}
+
+bool queue_empty(queue_t *queue)
+{
+    return queue->start == NULL;
 }
 
 void _debug_queue_print(queue_t *queue, void (*print_func)(void *))
