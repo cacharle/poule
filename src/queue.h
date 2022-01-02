@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 typedef struct queue_node
 {
@@ -14,12 +15,15 @@ typedef struct queue_node
 
 typedef struct
 {
-    queue_node_t *start;
-    queue_node_t *end;
+    queue_node_t   *start;
+    queue_node_t   *end;
+    pthread_mutex_t mutex;
 } queue_t;
 
 void
 queue_init(queue_t *queue);
+void
+queue_deinit(queue_t *queue);
 void *
 queue_push(queue_t *queue, void *data);
 void *

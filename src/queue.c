@@ -17,6 +17,13 @@ queue_init(queue_t *queue)
 {
     queue->start = NULL;
     queue->end = NULL;
+    pthread_mutex_init(&queue->mutex, NULL);
+}
+
+void
+queue_deinit(queue_t *queue)
+{
+    pthread_mutex_destroy(&queue->mutex);
 }
 
 void *
@@ -25,21 +32,30 @@ queue_push(queue_t *queue, void *data)
     queue_node_t *node = queue_node_create(data);
     if (node == NULL)
         return NULL;
+    pthread_mutex_lock(&queue->mutex);
     if (queue->start == NULL)
     {
         queue->start = node;
         queue->end = node;
+        pthread_mutex_unlock(&queue->mutex);
         return node;
     }
     node->next = queue->start;
     node->next->prev = node;
     queue->start = node;
+    pthread_mutex_unlock(&queue->mutex);
     return node->data;
 }
 
 void *
 queue_pop(queue_t *queue)
 {
+    pthread_mutex_lock(&queue->mutex);
+    if (queue_empty(queue))
+    {
+        pthread_mutex_unlock(&queue->mutex);
+        return NULL;
+    }
     queue_node_t *node = queue->end;
     if (node->prev == NULL)
     {
@@ -51,6 +67,7 @@ queue_pop(queue_t *queue)
         node->prev->next = NULL;
         queue->end = node->prev;
     }
+    pthread_mutex_unlock(&queue->mutex);
     void *data = node->data;
     free(node);
     return data;

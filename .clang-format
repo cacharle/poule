@@ -4,6 +4,8 @@
 
 Language: Cpp
 
+SortIncludes: false
+
 # PPIndentWidth: 1  # clang-format 13 only
 
 IndentWidth: 4
