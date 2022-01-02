@@ -1,6 +1,7 @@
 #include "pool.h"
 
-void *pool_job_routine(void *arg)
+void *
+pool_job_routine(void *arg)
 {
     pool_t *pool = arg;
     while (true)
@@ -12,12 +13,12 @@ void *pool_job_routine(void *arg)
         pthread_mutex_unlock(&pool->mutex_queue);
         if (data == NULL)
             continue;
-
     }
     return NULL;
 }
 
-int pool_init(pool_t *pool, size_t jobs_num, pool_func func)
+int
+pool_init(pool_t *pool, size_t jobs_num, pool_func func)
 {
     queue_init(&pool->queue);
     pool->func = func;
@@ -35,7 +36,8 @@ int pool_init(pool_t *pool, size_t jobs_num, pool_func func)
     return 0;
 }
 
-int pool_close(pool_t *pool)
+int
+pool_close(pool_t *pool)
 {
     if (!queue_empty(&pool->queue))
         return -1;
