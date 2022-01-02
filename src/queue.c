@@ -21,18 +21,26 @@ queue_init(queue_t *queue)
 }
 
 void
-queue_deinit(queue_t *queue)
+queue_deinit(queue_t *queue, void (*free_func)(void *))
 {
+    queue_node_t *node = queue->start;
+    while (node != NULL)
+    {
+        if (free_func != NULL)
+            free_func(node->data);
+        queue_node_t *curr = node;
+        node = node->next;
+        free(curr);
+    }
     pthread_mutex_destroy(&queue->mutex);
 }
 
-void *
-queue_push(queue_t *queue, void *data)
+static void *
+queue_push_unsafe(queue_t *queue, void *data)
 {
     queue_node_t *node = queue_node_create(data);
     if (node == NULL)
         return NULL;
-    pthread_mutex_lock(&queue->mutex);
     if (queue->start == NULL)
     {
         queue->start = node;
@@ -43,19 +51,23 @@ queue_push(queue_t *queue, void *data)
     node->next = queue->start;
     node->next->prev = node;
     queue->start = node;
-    pthread_mutex_unlock(&queue->mutex);
     return node->data;
 }
 
 void *
-queue_pop(queue_t *queue)
+queue_push(queue_t *queue, void *data)
 {
     pthread_mutex_lock(&queue->mutex);
+    void *node = queue_push_unsafe(queue, data);
+    pthread_mutex_unlock(&queue->mutex);
+    return node;
+}
+
+static void *
+queue_pop_unsafe(queue_t *queue)
+{
     if (queue_empty(queue))
-    {
-        pthread_mutex_unlock(&queue->mutex);
         return NULL;
-    }
     queue_node_t *node = queue->end;
     if (node->prev == NULL)
     {
@@ -67,9 +79,17 @@ queue_pop(queue_t *queue)
         node->prev->next = NULL;
         queue->end = node->prev;
     }
-    pthread_mutex_unlock(&queue->mutex);
     void *data = node->data;
     free(node);
+    return data;
+}
+
+void *
+queue_pop(queue_t *queue)
+{
+    pthread_mutex_lock(&queue->mutex);
+    void *data = queue_pop_unsafe(queue);
+    pthread_mutex_unlock(&queue->mutex);
     return data;
 }
 

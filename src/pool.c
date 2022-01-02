@@ -3,9 +3,11 @@
 void *
 pool_worker_routine(void *arg)
 {
+    // printf("hello thread %p\n", pthread_self());
     pool_t *pool = arg;
     while (true)
     {
+        // usleep(100);
         pool_result_t *result = queue_pop(&pool->queue_work);
         if (result == NULL)
         {
@@ -17,7 +19,9 @@ pool_worker_routine(void *arg)
         result->data = pool->func(result->data);
         result->state = RESULT_DONE;
         queue_push(&pool->queue_done, result);
+        // printf("h1 %p %p\n", pthread_self(), &result->mutex_finish);
         pthread_mutex_unlock(&result->mutex_finish);
+        // printf("h2 %p %p\n", pthread_self(), &result->mutex_finish);
     }
     return NULL;
 }
@@ -45,12 +49,11 @@ pool_init(pool_t *pool, size_t workers_num, pool_func func)
 int
 pool_shutdown(pool_t *pool)
 {
-    if (!queue_empty(&pool->queue_work))
-        return -1;
+    pool->shutdown = true;
     for (size_t i = 0; i < pool->threads_num; i++)
         pthread_join(pool->threads[i], NULL);
-    queue_deinit(&pool->queue_work);
-    queue_deinit(&pool->queue_done);
+    queue_deinit(&pool->queue_work, free);
+    queue_deinit(&pool->queue_done, free);
     free(pool->threads);
     return 0;
 }
@@ -85,7 +88,9 @@ pool_submit(pool_t *pool, void *data)
 void *
 pool_result_wait(pool_result_t *result)
 {
+    // printf("YOOOOOOOOOOOOOOOO %p\n", &result->mutex_finish);
     pthread_mutex_lock(&result->mutex_finish);
+    // printf("YOOOOOOOOOOOOOOOO %p\n", &result->mutex_finish);
     switch (result->state)
     {
     case RESULT_CANCELLED:

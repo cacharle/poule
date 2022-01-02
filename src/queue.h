@@ -23,7 +23,7 @@ typedef struct
 void
 queue_init(queue_t *queue);
 void
-queue_deinit(queue_t *queue);
+queue_deinit(queue_t *queue, void (*free_func)(void *));
 void *
 queue_push(queue_t *queue, void *data);
 void *
