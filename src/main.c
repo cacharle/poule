@@ -45,17 +45,25 @@ main(void)
     // printf("yo0\n");
     pool_init(&pool, 2, add_one_func);
     // printf("yo1\n");
-    pool_result_t *result36 = pool_submit(&pool, (void *)36UL);
+    // pool_result_t *result36 = pool_submit(&pool, (void *)36UL);
     // printf("yo2\n");
-    pool_result_t *result42 = pool_submit(&pool, (void *)42UL);
-    // printf("yo3\n");
+    // pool_result_t *result42 = pool_submit(&pool, (void *)42UL);
 
-    unsigned long r36 = (unsigned long)pool_result_wait(result36);
-    // printf("yo4\n");
-    unsigned long r42 = (unsigned long)pool_result_wait(result42);
-    // printf("yo5\n");
+    void *src[5] = {1, 2, 3, 4, 5};
+    void *dest[5] = {0};
 
-    printf("36=%lu 42=%lu\n", r36, r42);
+    pool_map(&pool, src, dest, 5);
+
+    // unsigned long r36 = (unsigned long)pool_result_wait(result36);
+    // unsigned long r42 = (unsigned long)pool_result_wait(result42);
+    for (int i = 0; i < 5; i++)
+        printf("%d, ", src[i]);
+    printf("\n");
+    for (int i = 0; i < 5; i++)
+        printf("%d, ", dest[i]);
+    printf("\n");
+
+    // printf("36=%lu 42=%lu\n", r36, r42);
 
     pool_shutdown(&pool);
 

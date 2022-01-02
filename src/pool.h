@@ -13,7 +13,7 @@ typedef struct
     queue_t    queue_work;
     queue_t    queue_done;
     pthread_t *threads;
-    size_t     threads_num;
+    size_t     threads_len;
     pool_func  func;
     bool       shutdown;
 } pool_t;
@@ -39,6 +39,8 @@ int
 pool_shutdown(pool_t *pool);
 pool_result_t *
 pool_submit(pool_t *pool, void *data);
+int
+pool_map(pool_t *pool, void **src, void **dest, size_t len);
 void *
 pool_result_wait(pool_result_t *result);
 

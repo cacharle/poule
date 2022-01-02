@@ -33,7 +33,7 @@ pool_init(pool_t *pool, size_t workers_num, pool_func func)
     queue_init(&pool->queue_done);
     pool->func = func;
     pool->shutdown = false;
-    pool->threads_num = workers_num;
+    pool->threads_len = workers_num;
     // pthread_mutex_init(&pool->mutex_queue, NULL);
     pool->threads = malloc(sizeof(pthread_t) * workers_num);
     if (pool->threads == NULL)
@@ -50,7 +50,7 @@ int
 pool_shutdown(pool_t *pool)
 {
     pool->shutdown = true;
-    for (size_t i = 0; i < pool->threads_num; i++)
+    for (size_t i = 0; i < pool->threads_len; i++)
         pthread_join(pool->threads[i], NULL);
     queue_deinit(&pool->queue_work, free);
     queue_deinit(&pool->queue_done, free);
@@ -83,6 +83,26 @@ pool_submit(pool_t *pool, void *data)
         return NULL;
     }
     return result;
+}
+
+int
+pool_map(pool_t *pool, void **src, void **dest, size_t len)
+{
+    pool_result_t **results = malloc(sizeof(pool_result_t *) * len);
+    if (results == NULL)
+        return -1;
+    for (size_t i = 0; i < len; i++)
+    {
+        results[i] = pool_submit(pool, src[i]);
+        if (results[i] == NULL)
+        {
+            free(results);
+            return -1;
+        }
+    }
+    for (size_t i = 0; i < len; i++)
+        dest[i] = pool_result_wait(results[i]);
+    return 0;
 }
 
 void *
