@@ -13,8 +13,8 @@
 void *
 add_one_func(void *data)
 {
-    int *i = data;
-    *i += 1;
+    unsigned long i = data;
+    i += 1;
     usleep(50000);
     return i;
 }

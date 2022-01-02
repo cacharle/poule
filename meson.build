@@ -1,4 +1,5 @@
 project('poule', 'c', default_options : ['c_std=c99'])
+add_global_arguments('-g', language : 'c')
 thread_dep = dependency('threads')
 subdir('src')
 executable('example', sources, dependencies : thread_dep)

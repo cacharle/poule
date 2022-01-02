@@ -26,6 +26,7 @@ int
 pool_init(pool_t *pool, size_t workers_num, pool_func func)
 {
     queue_init(&pool->queue_work);
+    queue_init(&pool->queue_done);
     pool->func = func;
     pool->shutdown = false;
     pool->threads_num = workers_num;
@@ -35,7 +36,7 @@ pool_init(pool_t *pool, size_t workers_num, pool_func func)
         return -1;
     for (size_t i = 0; i < workers_num; i++)
     {
-        if (pthread_create(&pool->threads[i], NULL, pool_worker_routine, &pool) != 0)
+        if (pthread_create(&pool->threads[i], NULL, pool_worker_routine, pool) != 0)
             return -1;
     }
     return 0;
