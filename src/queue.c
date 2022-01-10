@@ -1,4 +1,4 @@
-#include "queue.h"
+#include "poule/queue.h"
 
 static _pl_queue_node_t *
 node_create(void *data)

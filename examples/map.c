@@ -1,8 +1,8 @@
 #define _XOPEN_SOURCE 500
 #include <unistd.h>
 #include <stdio.h>
-#include "queue.h"
-#include "pool.h"
+#include "poule/queue.h"
+#include "poule/pool.h"
 
 // void
 // print_pointer(void *p)

@@ -21,7 +21,7 @@ $ ./build/example
 - Multiple examples
      - [ ] Mandelbrot
      - [ ] Approximate Pi
-- [ ] Make a library
+- [x] Make a library
 - [ ] Add `pool_map_unordered`
 - Unit test
      - [ ] `queue`

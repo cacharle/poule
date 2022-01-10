@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <pthread.h>
-#include "queue.h"
+#include "poule/queue.h"
 
 typedef void *(*pool_func)(void *data);
 

@@ -1,4 +1,4 @@
-#include "pool.h"
+#include "poule/pool.h"
 
 static void *
 worker_routine(void *arg)
