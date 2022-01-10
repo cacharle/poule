@@ -17,6 +17,7 @@ pl_queue_init(pl_queue_t *queue)
 {
     queue->start = NULL;
     queue->end = NULL;
+    queue->len = 0;
     pthread_mutex_init(&queue->mutex, NULL);
 }
 
