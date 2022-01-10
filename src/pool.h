@@ -10,15 +10,15 @@ typedef void *(*pool_func)(void *data);
 
 typedef struct
 {
-    queue_t    queue_work;
-    queue_t    queue_done;
+    pl_queue_t queue_work;
+    pl_queue_t queue_done;
     pthread_t *threads;
     size_t     threads_len;
     pool_func  func;
     bool       shutdown;
-} pool_t;
+} pl_pool_t;
 
-enum pool_result_state
+enum pl_result_state
 {
     RESULT_PENDING,
     RESULT_RUNNING,
@@ -28,20 +28,22 @@ enum pool_result_state
 
 typedef struct
 {
-    void                  *data;
-    enum pool_result_state state;
-    pthread_mutex_t        mutex_finish;
-} pool_result_t;
+    void                *data;
+    enum pl_result_state state;
+    pthread_mutex_t      mutex_finish;
+} pl_result_t;
 
 int
-pool_init(pool_t *pool, size_t workers_num, pool_func func);
+pl_pool_init(pl_pool_t *pool, size_t workers_num, pool_func func);
 int
-pool_shutdown(pool_t *pool);
-pool_result_t *
-pool_submit(pool_t *pool, void *data);
+pl_pool_shutdown(pl_pool_t *pool);
+pl_result_t *
+pl_pool_submit(pl_pool_t *pool, void *data);
 int
-pool_map(pool_t *pool, void **src, void **dest, size_t len);
+pl_pool_map(pl_pool_t *pool, void **src, void **dest, size_t len);
 void *
-pool_result_wait(pool_result_t *result);
+pl_result_wait(pl_result_t *result);
+void **
+pl_pool_drain(pl_pool_t *pool);
 
 #endif

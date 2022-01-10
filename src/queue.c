@@ -1,9 +1,9 @@
 #include "queue.h"
 
-queue_node_t *
-queue_node_create(void *data)
+static _pl_queue_node_t *
+node_create(void *data)
 {
-    queue_node_t *node = malloc(sizeof(queue_node_t));
+    _pl_queue_node_t *node = malloc(sizeof(_pl_queue_node_t));
     if (node == NULL)
         return NULL;
     node->next = NULL;
@@ -13,7 +13,7 @@ queue_node_create(void *data)
 }
 
 void
-queue_init(queue_t *queue)
+pl_queue_init(pl_queue_t *queue)
 {
     queue->start = NULL;
     queue->end = NULL;
@@ -21,14 +21,14 @@ queue_init(queue_t *queue)
 }
 
 void
-queue_deinit(queue_t *queue, void (*free_func)(void *))
+pl_queue_deinit(pl_queue_t *queue, void (*free_func)(void *))
 {
-    queue_node_t *node = queue->start;
+    _pl_queue_node_t *node = queue->start;
     while (node != NULL)
     {
         if (free_func != NULL)
             free_func(node->data);
-        queue_node_t *curr = node;
+        _pl_queue_node_t *curr = node;
         node = node->next;
         free(curr);
     }
@@ -36,16 +36,16 @@ queue_deinit(queue_t *queue, void (*free_func)(void *))
 }
 
 static void *
-queue_push_unsafe(queue_t *queue, void *data)
+queue_push_unsafe(pl_queue_t *queue, void *data)
 {
-    queue_node_t *node = queue_node_create(data);
+    _pl_queue_node_t *node = node_create(data);
     if (node == NULL)
         return NULL;
+    queue->len++;
     if (queue->start == NULL)
     {
         queue->start = node;
         queue->end = node;
-        pthread_mutex_unlock(&queue->mutex);
         return node;
     }
     node->next = queue->start;
@@ -55,7 +55,7 @@ queue_push_unsafe(queue_t *queue, void *data)
 }
 
 void *
-queue_push(queue_t *queue, void *data)
+pl_queue_push(pl_queue_t *queue, void *data)
 {
     pthread_mutex_lock(&queue->mutex);
     void *node = queue_push_unsafe(queue, data);
@@ -64,11 +64,12 @@ queue_push(queue_t *queue, void *data)
 }
 
 static void *
-queue_pop_unsafe(queue_t *queue)
+queue_pop_unsafe(pl_queue_t *queue)
 {
-    if (queue_empty(queue))
+    if (pl_queue_empty(queue))
         return NULL;
-    queue_node_t *node = queue->end;
+    queue->len--;
+    _pl_queue_node_t *node = queue->end;
     if (node->prev == NULL)
     {
         queue->start = NULL;
@@ -85,7 +86,7 @@ queue_pop_unsafe(queue_t *queue)
 }
 
 void *
-queue_pop(queue_t *queue)
+pl_queue_pop(pl_queue_t *queue)
 {
     pthread_mutex_lock(&queue->mutex);
     void *data = queue_pop_unsafe(queue);
@@ -93,17 +94,23 @@ queue_pop(queue_t *queue)
     return data;
 }
 
-bool
-queue_empty(queue_t *queue)
+size_t
+pl_queue_len(pl_queue_t *queue)
 {
-    return queue->start == NULL;
+    return queue->len;
+}
+
+bool
+pl_queue_empty(pl_queue_t *queue)
+{
+    return pl_queue_len(queue) == 0;
 }
 
 void
-_debug_queue_print(queue_t *queue, void (*print_func)(void *))
+_debug_pl_queue_print(pl_queue_t *queue, void (*print_func)(void *))
 {
     size_t i = 0;
-    for (queue_node_t *node = queue->start; node != NULL; node = node->next, i++)
+    for (_pl_queue_node_t *node = queue->start; node != NULL; node = node->next, i++)
     {
         printf("[%zu=", i);
         print_func(node->data);

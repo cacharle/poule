@@ -11,27 +11,30 @@ typedef struct queue_node
     struct queue_node *next;
     struct queue_node *prev;
     void              *data;
-} queue_node_t;
+} _pl_queue_node_t;
 
 typedef struct
 {
-    queue_node_t   *start;
-    queue_node_t   *end;
-    pthread_mutex_t mutex;
-} queue_t;
+    _pl_queue_node_t *start;
+    _pl_queue_node_t *end;
+    pthread_mutex_t   mutex;
+    size_t            len;
+} pl_queue_t;
 
 void
-queue_init(queue_t *queue);
+pl_queue_init(pl_queue_t *queue);
 void
-queue_deinit(queue_t *queue, void (*free_func)(void *));
+pl_queue_deinit(pl_queue_t *queue, void (*free_func)(void *));
 void *
-queue_push(queue_t *queue, void *data);
+pl_queue_push(pl_queue_t *queue, void *data);
 void *
-queue_pop(queue_t *queue);
+pl_queue_pop(pl_queue_t *queue);
+size_t
+pl_queue_len(pl_queue_t *queue);
 bool
-queue_empty(queue_t *queue);
+pl_queue_empty(pl_queue_t *queue);
 
 void
-_debug_queue_print(queue_t *queue, void (*print_func)(void *));
+_debug_pl_queue_print(pl_queue_t *queue, void (*print_func)(void *));
 
 #endif

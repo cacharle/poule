@@ -14,4 +14,18 @@ $ ninja -C build
 $ ./build/example
 ```
 
+## TODO
+
+- [ ] Process pool
+- [ ] Benchmark
+- Multiple examples
+     - [ ] Mandelbrot
+     - [ ] Approximate Pi
+- [ ] Make a library
+- [ ] Add `pool_map_unordered`
+- Unit test
+     - [ ] `queue`
+     - [ ] `pool`
+- [ ] Move the function parameter to `submit` instead of `pool_init`
+
 [1]: https://mesonbuild.com/index.html

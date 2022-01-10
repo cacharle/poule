@@ -41,9 +41,9 @@ main(void)
     // //printf("%d\n", d);
     // _debug_queue_print(&queue, print_pointer);
 
-    pool_t pool;
+    pl_pool_t pool;
     // printf("yo0\n");
-    pool_init(&pool, 2, add_one_func);
+    pl_pool_init(&pool, 2, add_one_func);
     // printf("yo1\n");
     // pool_result_t *result36 = pool_submit(&pool, (void *)36UL);
     // printf("yo2\n");
@@ -52,7 +52,7 @@ main(void)
     void *src[5] = {1, 2, 3, 4, 5};
     void *dest[5] = {0};
 
-    pool_map(&pool, src, dest, 5);
+    pl_pool_map(&pool, src, dest, 5);
 
     // unsigned long r36 = (unsigned long)pool_result_wait(result36);
     // unsigned long r42 = (unsigned long)pool_result_wait(result42);
@@ -65,7 +65,7 @@ main(void)
 
     // printf("36=%lu 42=%lu\n", r36, r42);
 
-    pool_shutdown(&pool);
+    pl_pool_shutdown(&pool);
 
     return 0;
 }
