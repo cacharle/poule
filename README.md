@@ -20,7 +20,7 @@ $ ./build/example
 - [ ] Benchmark
 - Multiple examples
      - [ ] Mandelbrot
-     - [ ] Approximate Pi
+     - [x] Approximate Pi
 - [x] Make a library
 - [ ] Add `pool_map_unordered`
 - Unit test

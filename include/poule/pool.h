@@ -1,6 +1,8 @@
 #ifndef POULE_POOL_H
 #define POULE_POOL_H
 
+#define _XOPEN_SOURCE 500
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <pthread.h>

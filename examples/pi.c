@@ -3,24 +3,19 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-
-// double frand(void)
-// {
-//     return (double)random() / (double)RAND_MAX;
-// }
-
+#include "poule/pool.h"
 
 void *point_in_circle(void *_)
 {
-    double x = drand48();
-    double y = drand48();
+    double x = drand48() - 0.5;
+    double y = drand48() - 0.5;
     bool is_in = sqrt(x * x + y * y) < 0.5;
     return (void*)is_in;
 }
 
 const char *rand_filepath = "/dev/random";
-const size_t worker_count = 10;
-const size_t points_count = 100;
+const size_t worker_count = 6;
+const size_t points_count = 1000000;
 
 int main(void)
 {
@@ -30,17 +25,26 @@ int main(void)
     long seed;
     fread(&seed, 1, sizeof(seed), file);
     fclose(file);
-    // srandom(seed);
     srand48(seed);
 
-    pool_t pool;
-    pool_init(&pool, worker_count, point_in_circle);
+    pl_pool_t pool;
+    pl_pool_init(&pool, worker_count, point_in_circle);
 
     for (int i = 0; i < points_count; i++)
-        submit
+        pl_pool_submit(&pool, NULL);
 
 
-    pool_drain();
+    void **datum = pl_pool_drain(&pool);
+    size_t points_inside_count = 0;
+    for (size_t i = 0; i < points_count; i++)
+        if ((bool)datum[i])
+            points_inside_count++;
 
+    double pi_approx = 4.0 * ((double)points_inside_count / (double)points_count);
+    printf("pi approx: %f\n", pi_approx);
+    printf("pi       : %f\n", M_PI);
+    printf("diff     : %f\n", fabs(M_PI - pi_approx));
+
+    pl_pool_shutdown(&pool);
     return 0;
 }

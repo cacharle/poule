@@ -3,7 +3,6 @@
 static void *
 worker_routine(void *arg)
 {
-    // printf("hello thread %p\n", pthread_self());
     pl_pool_t *pool = arg;
     while (true)
     {
@@ -19,9 +18,7 @@ worker_routine(void *arg)
         result->data = pool->func(result->data);
         result->state = RESULT_DONE;
         pl_queue_push(&pool->queue_done, result);
-        // printf("h1 %p %p\n", pthread_self(), &result->mutex_finish);
         pthread_mutex_unlock(&result->mutex_finish);
-        // printf("h2 %p %p\n", pthread_self(), &result->mutex_finish);
     }
     return NULL;
 }
@@ -109,7 +106,8 @@ void **
 pl_pool_drain(pl_pool_t *pool)
 {
     while (!pl_queue_empty(&pool->queue_work))
-        ;
+        usleep(1000);
+    // FIXME: could pop inn work Q but result still being processed during drain
     size_t datum_len = pl_queue_len(&pool->queue_done);
     void **datum = malloc(sizeof(void *) * datum_len);
     if (datum == NULL)
@@ -126,9 +124,7 @@ pl_pool_drain(pl_pool_t *pool)
 void *
 pl_result_wait(pl_result_t *result)
 {
-    // printf("YOOOOOOOOOOOOOOOO %p\n", &result->mutex_finish);
     pthread_mutex_lock(&result->mutex_finish);
-    // printf("YOOOOOOOOOOOOOOOO %p\n", &result->mutex_finish);
     switch (result->state)
     {
     case RESULT_CANCELLED:
