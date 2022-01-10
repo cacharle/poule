@@ -11,7 +11,13 @@ Install the [meson build system][1]
 ```
 $ meson setup build
 $ ninja -C build
-$ ./build/example
+```
+
+Run one of the examples:
+
+```
+$ ./build/examples/map
+$ ./build/examples/pi
 ```
 
 ## TODO
@@ -27,5 +33,10 @@ $ ./build/example
      - [ ] `queue`
      - [ ] `pool`
 - [ ] Move the function parameter to `submit` instead of `pool_init`
+- [ ] Add optional callback
+- [ ] Add batch system for computation which take little time.
+      Wrap the user function in a loop (in `worker_routine`)
+
+
 
 [1]: https://mesonbuild.com/index.html
