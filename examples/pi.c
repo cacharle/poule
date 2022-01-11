@@ -1,4 +1,5 @@
 #define _XOPEN_SOURCE 500
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -9,16 +10,16 @@ void *point_in_circle(void *_)
 {
     double x = drand48() - 0.5;
     double y = drand48() - 0.5;
-    bool is_in = sqrt(x * x + y * y) < 0.5;
+    bool is_in = x * x + y * y < 0.25;
     return (void*)is_in;
 }
 
 const char *rand_filepath = "/dev/random";
-const size_t worker_count = 6;
 const size_t points_count = 1000000;
 
 int main(void)
 {
+    const size_t worker_count = sysconf(_SC_NPROCESSORS_ONLN);
     FILE *file = fopen(rand_filepath, "r");
     if (file == NULL)
         exit(1);
