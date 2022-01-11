@@ -1,4 +1,4 @@
 sources = files(
-  'pool.c',
+  'tpool.c',
   'queue.c'
 )

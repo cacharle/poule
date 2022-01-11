@@ -1,12 +1,11 @@
-#include "poule/pool.h"
+#include "poule/tpool.h"
 
 static void *
 worker_routine(void *arg)
 {
-    pl_pool_t *pool = arg;
+    pl_tpool_t *pool = arg;
     while (true)
     {
-        // usleep(100);
         pl_result_t *result = pl_queue_pop(&pool->queue_work);
         if (result == NULL)
         {
@@ -24,7 +23,7 @@ worker_routine(void *arg)
 }
 
 int
-pl_pool_init(pl_pool_t *pool, size_t workers_num, pool_func func)
+pl_tpool_init(pl_tpool_t *pool, size_t workers_num, pool_func func)
 {
     pl_queue_init(&pool->queue_work);
     pl_queue_init(&pool->queue_done);
@@ -44,7 +43,7 @@ pl_pool_init(pl_pool_t *pool, size_t workers_num, pool_func func)
 }
 
 int
-pl_pool_shutdown(pl_pool_t *pool)
+pl_tpool_shutdown(pl_tpool_t *pool)
 {
     pool->shutdown = true;
     for (size_t i = 0; i < pool->threads_len; i++)
@@ -69,7 +68,7 @@ _result_create(void *data)
 }
 
 pl_result_t *
-pl_pool_submit(pl_pool_t *pool, void *data)
+pl_tpool_submit(pl_tpool_t *pool, void *data)
 {
     pl_result_t *result = _result_create(data);
     if (result == NULL)
@@ -83,14 +82,14 @@ pl_pool_submit(pl_pool_t *pool, void *data)
 }
 
 int
-pl_pool_map(pl_pool_t *pool, void **src, void **dest, size_t len)
+pl_tpool_map(pl_tpool_t *pool, void **src, void **dest, size_t len)
 {
     pl_result_t **results = malloc(sizeof(pl_result_t *) * len);
     if (results == NULL)
         return -1;
     for (size_t i = 0; i < len; i++)
     {
-        results[i] = pl_pool_submit(pool, src[i]);
+        results[i] = pl_tpool_submit(pool, src[i]);
         if (results[i] == NULL)
         {
             free(results);
@@ -103,7 +102,7 @@ pl_pool_map(pl_pool_t *pool, void **src, void **dest, size_t len)
 }
 
 void **
-pl_pool_drain(pl_pool_t *pool)
+pl_tpool_drain(pl_tpool_t *pool)
 {
     while (!pl_queue_empty(&pool->queue_work))
         usleep(1000);

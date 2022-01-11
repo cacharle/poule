@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
-#include "poule/pool.h"
+#include "poule/tpool.h"
 
 void *point_in_circle(void *_)
 {
@@ -28,14 +28,14 @@ int main(void)
     fclose(file);
     srand48(seed);
 
-    pl_pool_t pool;
-    pl_pool_init(&pool, worker_count, point_in_circle);
+    pl_tpool_t pool;
+    pl_tpool_init(&pool, worker_count, point_in_circle);
 
     for (int i = 0; i < points_count; i++)
-        pl_pool_submit(&pool, NULL);
+        pl_tpool_submit(&pool, NULL);
 
 
-    void **datum = pl_pool_drain(&pool);
+    void **datum = pl_tpool_drain(&pool);
     size_t points_inside_count = 0;
     for (size_t i = 0; i < points_count; i++)
         if ((bool)datum[i])
@@ -46,6 +46,6 @@ int main(void)
     printf("pi       : %f\n", M_PI);
     printf("diff     : %f\n", fabs(M_PI - pi_approx));
 
-    pl_pool_shutdown(&pool);
+    pl_tpool_shutdown(&pool);
     return 0;
 }
