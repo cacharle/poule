@@ -48,9 +48,9 @@ pl_tpool_shutdown(pl_tpool_t *pool)
     pool->shutdown = true;
     for (size_t i = 0; i < pool->threads_len; i++)
         pthread_join(pool->threads[i], NULL);
+    free(pool->threads);
     pl_queue_deinit(&pool->queue_work, free);
     pl_queue_deinit(&pool->queue_done, free);
-    free(pool->threads);
     return 0;
 }
 
