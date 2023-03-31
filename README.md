@@ -2,7 +2,7 @@
 
 > poule means chicken in french, it sound like pool, I am a very funny person.
 
-Educational project to understand of thread pools work.
+Educational project to understand how thread pools work.
 
 ## Usage
 
